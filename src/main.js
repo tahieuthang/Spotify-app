@@ -7,6 +7,7 @@ import router from './router'
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import loadingDirective from './plugins/loadingState.js'
+import '@fortawesome/fontawesome-free/css/all.css';
 
 const app = createApp(App)
 app.use(createPinia())

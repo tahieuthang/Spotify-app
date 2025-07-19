@@ -79,9 +79,6 @@ const onSubmit = handleSubmit(async (values) => {
   loadingState.value = true
   try {
     const response = await axios.get('/users')
-    console.log(response);
-    console.log(values);
-    
     if(response) {
       const name = response.data.map((res) => res.name)
       const password = response.data.map((res) => res.password)

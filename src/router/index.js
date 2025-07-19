@@ -21,6 +21,22 @@ const router = createRouter({
       }
     },
     {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/pages/profile/index.vue'),
+      meta: {
+        requiresAuth: false,
+      }
+    },
+    {
+      path: '/play-list/:idPlayList',
+      name: 'play-list',
+      component: () => import('@/pages/play-list/[idPlayList].vue'),
+      meta: {
+        requiresAuth: false,
+      }
+    },
+    {
       path: '/',
       name: 'dashboard',
       component: () => import('@/components/dashboard/Content.vue'),
@@ -35,8 +51,6 @@ router.beforeEach(async (to, from, next) => {
   const stores = useCounterStore()
  
   const isLogged = stores.isLogged
-  console.log(isLogged)
-  
   // next-line: check if route ("to" object) needs authenticated
   if (to.matched.some((record) => record.meta.requiresAuth) && !isLogged) {
     next({ name: "login" });
