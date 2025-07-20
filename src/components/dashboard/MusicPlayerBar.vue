@@ -8,7 +8,6 @@
         <p class="font-semibold text-white text-lg">{{ currentSong?.song_name }}</p>
         <p class="font-semibold text-gray-500 text-lg">{{ currentSong?.author }}</p>
       </div>
-      <button class="flex items-center justify-center w-7 h-7 rounded-full border border-neutral-800 border-3 cursor-pointer"><i class="fa-solid fa-plus text-sm"></i></button>
     </div>
 
     <div class="flex flex-col gap-2 items-center justify-center flex-1">
@@ -72,11 +71,7 @@ watch(() => stores.currentSong, async (newCurrentSong) => {
 
 // Điều chỉnh audio
 const seek = (e) => {
-  console.log(e.target.value);
-  
   const value = parseFloat(e.target.value)
-  console.log(audio.value, audio.value.readyState);
-  
   if (audio.value && audio.value.readyState >= 1) {
     audio.value.currentTime = value
   } else {

@@ -5,7 +5,7 @@
         <img src="https://img.icons8.com/ios-filled/50/ffffff/spotify--v1.png" alt="spotify" class="mr-2 h-11 w-11" />
       </div>
       <div class="mr-3">
-        <button class="cursor-pointer rounded-full w-16 h-16 bg-neutral-800 p-2 hover:bg-neutral-600 transition">
+        <button @click="goHome" class="cursor-pointer rounded-full w-16 h-16 bg-neutral-800 p-2 hover:bg-neutral-600 transition">
           <i class="fa-solid fa-house text-white text-2xl"></i>
         </button>
       </div>
@@ -46,7 +46,7 @@
         </div>
         <div id="profile" class="w-[200px] h-[100px] bg-neutral-800 rounded-sm p-3 absolute top-18 right-0">
           <ul class="w-full">
-            <router-link><li class="font-bold text-white mb-5">Tài khoản</li></router-link>
+            <router-link to="/profile"><li class="font-bold text-white mb-5">Tài khoản</li></router-link>
             <li @click="logout" class="font-bold text-white"><button class="border-none">Đăng xuất</button></li>
           </ul>
         </div>
@@ -78,6 +78,7 @@ import { useCounterStore } from '@/stores/authStore'
 
 const stores = useCounterStore()
 const isAuthenticated = computed(() => stores.isLogged)
+const router = useRouter()
 
 const dropdown = () => {
   const isOpen = !stores.getIsDropDown
@@ -98,5 +99,9 @@ const logout = () => {
     stores.setUser(null)
   }
   location.reload()
+}
+
+const goHome = () => {
+  router.push('/')
 }
 </script>

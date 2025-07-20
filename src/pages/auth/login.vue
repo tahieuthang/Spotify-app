@@ -80,14 +80,11 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     const response = await axios.get('/users')
     if(response) {
-      const name = response.data.map((res) => res.name)
-      const password = response.data.map((res) => res.password)
-      if(name.includes(values.name) && password.includes(values.password)) {
+      const user = response.data.find((res) => res.name === values.name && res.password === values.password)
+      if(user) {
         router.push('/')
         notify('Đăng ký thành công', 'success')
-        localStorage.setItem('Authorization', true)
-        localStorage.setItem('userInfo', JSON.stringify(values))
-        stores.setUser(values)
+        stores.setUser(user)
       }
     }
   } finally {

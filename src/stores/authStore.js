@@ -3,12 +3,14 @@ import { defineStore } from 'pinia';
 export const useCounterStore = defineStore('auth', {
   state: () => ({
     auth: localStorage.getItem('Authorization') || null,
-    userInfo: localStorage.getItem('userInfo') || null,
+    userInfo: JSON.parse(localStorage.getItem('userInfo')),
     dataSearch: [],
     keySearch: "",
     visiblePlayBtn: null,
     visiblePlayListBtn: null,
     isDropDown: false,
+    open: false,
+    close: false,
     isPlaying: false,
     songs: JSON.parse(localStorage.getItem('ListSong')) || null,
     currentIndex: Number(localStorage.getItem('CurrentIndex')),
@@ -21,6 +23,8 @@ export const useCounterStore = defineStore('auth', {
     getUser: (state) => state.userInfo,
     isVisible: (state) => state.visiblePlayBtn,
     isVisiblePlayList: (state) => state.visiblePlayListBtn,
+    isClose: (state) => state.close,
+    isOpen: (state) => state.open,
     isPlayingSong: (state) => state.isPlaying,
     allSongs: (state) => state.songs,
     currentSong: (state) => Array.isArray(state.songs) && state.songs.length > 0 ? state.songs[state.currentIndex] : null,
@@ -45,10 +49,13 @@ export const useCounterStore = defineStore('auth', {
   },
   actions: {
     setToken(token) {
-      this.token = token;
+      this.token = token
     },
     setUser(user) {
-      this.userInfo = user;
+      this.auth = true
+      this.userInfo = user
+      localStorage.setItem('userInfo', JSON.stringify(user))
+      localStorage.setItem('Authorization', true)
     },
     setDataSearch(dataSearch) {
       this.dataSearch = dataSearch
@@ -65,6 +72,9 @@ export const useCounterStore = defineStore('auth', {
     setIsDropDown(value) {
       this.isDropDown = value
     },
+    setIsClose(value) {
+      this.close = value
+    },
     play(value) {
       this.isPlaying = value
       localStorage.setItem('IsPlaying', value)
@@ -80,10 +90,6 @@ export const useCounterStore = defineStore('auth', {
     playlistId(value) {
       this.currentPlaylistId = value
       localStorage.setItem('CurrentPlaylistId', value)
-    },
-    setPlaylist(value) {
-      this.arrayPlaylist = value
-      localStorage.setItem('ArrayPlaylist', JSON.stringify(value))
     },
     next() {
       const currentIndex = this.currentIndex
@@ -103,6 +109,9 @@ export const useCounterStore = defineStore('auth', {
     },
     setAudioRef(el) {
       this.audioRef = el
+    },
+    setisOpen(value) {
+      this.open = value
     }
   }
 });

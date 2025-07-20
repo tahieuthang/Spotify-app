@@ -13,6 +13,13 @@
           <p class="font-bold text-gray-500"><span class="font-bold text-lg text-white">Spotify</span> &bull; 2230 lượt lưu &bull; 50 bài hát, khoảng 3 giờ 30 phút</p>
         </div>
       </div>
+      <div id="notification" class="hidden flex flex-col justify-start gap-2 bg-[#4cb3ff] rounded-xl p-5 h-32 w-100 fixed right-5 top-25 z-50">
+        <div class="flex justify-between items-center">
+          <p class="font-bold text-black text-xl">Bạn đã đăng xuất</p>
+          <button @click="closeX" class="border-none cursor-pointer"><i class="fa-solid fa-xmark text-black text-2xl"></i></button>
+        </div>
+        <p class="font-semibold text-black text-lg">Đăng nhập để thêm bài hát vào Bài hát đã thích của bạn.</p>
+      </div>
     </div>
     <div class="flex gap-4 items-center mb-1">
       <button @click="playPlayList" class="flex justify-center items-center rounded-full w-15 h-15 bg-green-500 hover:scale-105 hover:bg-green-400 cursor-pointer">
@@ -45,8 +52,12 @@
                   <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong.id == song.id && data.playListInfo.id == currentPlaylist }">{{ song.song_name }}</p>
                   <p class="font-semibold text-gray-500 text-lg">{{ song.author }}</p>
                 </div>
-              </div></td>
-            <td><button v-show="visibleSave == song.id" class="flex items-center justify-center w-7 h-7 rounded-full border border-neutral-800 border-3 cursor-pointer"><i class="fa-solid fa-plus text-sm"></i></button></td>
+              </div>
+            </td>
+            <td>
+              <button v-if="existFav(song.id)" class="flex items-center justify-center w-5 h-5 rounded-full border-none bg-green-500 cursor-pointer"><i class="fa-solid fa-check text-xs text-black"></i></button>
+              <button v-else v-show="visibleSave == song.id" @click="(event) => { event.stopPropagation(); addFavSong(song.id); }" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
+            </td>
             <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ song.time }}</td>
           </tr>
       </tbody>
@@ -61,10 +72,12 @@ import Footer from '@/components/dashboard/Footer.vue'
 import axios from '@/utils/axios'
 import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue'
 import { useCounterStore } from '@/stores/authStore'
+import { useNotify } from '@/utils/useNotify'
 
 const route = useRoute()
 const stores = useCounterStore()
 const audio = computed(() => stores.getAudioRef)
+const isAuthenticated = computed(() => stores.isLogged)
 
 const data = ref({
   playListInfo: {},
@@ -143,6 +156,52 @@ const playPlayList = () => {
     } else {
       audio.value.pause()
     }
+  }
+}
+
+// Yêu thích bài hát
+const { notify } = useNotify()
+const addFavSong = async (songId) => {
+  if(isAuthenticated.value) { 
+    const userLogin = stores.getUser
+    if(!userLogin.favourite_song.includes(songId)) {
+      userLogin.favourite_song.push(songId)
+    }
+    const response = await axios.patch(`/users/${userLogin.id}`, {
+      favourite_song: userLogin.favourite_song,
+    })
+    console.log(response); 
+    if(response.status == 200) {
+      notify('Đã thêm vào bài hát yêu thích', 'success')
+      const newInfoUser = {
+        id: userLogin.id,
+        name: userLogin.name,
+        password: userLogin.password,
+        favourite_song: userLogin.favourite_song
+      }
+      stores.setUser(newInfoUser)
+    }
+  } else {
+    document.getElementById('notification').classList.remove('hidden')
+  }
+}
+
+const userLogin = computed(() => stores.getUser)
+const existFav = (id) => {
+  if(isAuthenticated.value) {
+    if(userLogin.value?.favourite_song.includes(id)) {
+      return true
+    }
+  } else {
+    return false
+  }
+}
+
+const closeX = () => {
+  const state = !stores.isClose
+  stores.setIsClose(state)
+  if(state) {
+    document.getElementById('notification').classList.add('hidden')
   }
 }
 </script>
