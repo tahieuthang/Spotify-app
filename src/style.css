@@ -60,9 +60,9 @@ button:hover {
   border-color: white;
 }
 
-input:hover {
+/* input:hover {
   border-color: white;
-}
+} */
 
 .card {
   padding: 2em;

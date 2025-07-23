@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col gap-15 bg-neutral-900 rounded-xl px-7 py-8">
     <div class="flex gap-8">
-      <div class="w-[250px] h-[250px] bg-cover">
-        <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm" />
+      <div class="bg-cover">
+        <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
       </div>
-      <div class="flex flex-col justify-end items-start gap-3">
+      <div class="flex flex-col justify-end items-start gap-6">
         <p class="font-bold text-lg">Danh sách phát công khai</p>
-        <p class="font-extrabold text-7xl">{{ data.playListInfo.name }}</p>
+        <p class="font-extrabold text-9xl whitespace-nowrap overflow-hidden overflow-ellipsis">{{ data.playListInfo.name }}</p>
         <p class="font-bold text-gray-500">Của {{ data.ownerInfor.name }}</p>
         <div class="flex gap-3 items-center">
           <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" class="w-6 h-6" />
@@ -54,7 +54,7 @@
                 </div>
               </div>
             </td>
-            <td>
+            <td class="w-[40px]">
               <button v-if="existFav(song.id)" class="flex items-center justify-center w-5 h-5 rounded-full border-none bg-green-500 cursor-pointer"><i class="fa-solid fa-check text-xs text-black"></i></button>
               <button v-else v-show="visibleSave == song.id" @click="(event) => { event.stopPropagation(); addFavSong(song.id); }" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
             </td>
@@ -170,7 +170,6 @@ const addFavSong = async (songId) => {
     const response = await axios.patch(`/users/${userLogin.id}`, {
       favourite_song: userLogin.favourite_song,
     })
-    console.log(response); 
     if(response.status == 200) {
       notify('Đã thêm vào bài hát yêu thích', 'success')
       const newInfoUser = {

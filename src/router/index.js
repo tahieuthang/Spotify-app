@@ -25,7 +25,15 @@ const router = createRouter({
       name: 'profile',
       component: () => import('@/pages/profile/index.vue'),
       meta: {
-        requiresAuth: false,
+        requiresAuth: true,
+      }
+    },
+    {
+      path: '/library/:idMyPlaylist',
+      name: 'library',
+      component: () => import('@/pages/library/[idMyPlaylist].vue'),
+      meta: {
+        requiresAuth: true,
       }
     },
     {
@@ -33,7 +41,7 @@ const router = createRouter({
       name: 'play-list',
       component: () => import('@/pages/play-list/[idPlayList].vue'),
       meta: {
-        requiresAuth: false,
+        requiresAuth: true,
       }
     },
     {

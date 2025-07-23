@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-25 px-3 py-2">
-    <div class="flex  items-center gap-4 flex-1">
+    <div class="flex items-center gap-4 flex-1">
       <div class="w-19 h-19 bg-cover">
         <img :src="currentSong?.cover_url" alt="cover" class="rounded-sm" />
       </div>

@@ -1,5 +1,5 @@
 <template>
-  <div @click="handleClickSong" class="flex flex-col gap-2 p-4 hover:rounded-xl hover:bg-neutral-800 max-h-[290px] relative">
+  <div @click="handleClickSong" class="flex flex-col gap-2 p-3 hover:rounded-xl hover:bg-neutral-800 max-h-[290px] relative">
     <div class="w-40 h-40 bg-cover">
       <img :src="songData.cover_url" alt="cover" class="rounded-lg" />
     </div>

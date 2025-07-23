@@ -5,7 +5,7 @@
       <div class="relative">
         <Swiper
           :modules="[Navigation]"
-          :slides-per-view="5"
+          :slides-per-view="6"
           :space-between="10"
           :loop="true"
           :navigation="navigationOptions"
@@ -23,20 +23,27 @@
     <div class="flex flex-col gap-5">
       <p class="text-3xl font-bold">Album và đĩa đơn nổi tiếng</p>
       <div class="relative">
-        <Swiper
-          :modules="[Navigation]"
-          :slides-per-view="5"
-          :space-between="10"
-          :loop="true"
-          :navigation="navigationOptions"
-          class="mySwiper flex gap-3"
-        >
-          <SwiperSlide v-for="(playList, index) in data.playListData" :key="playList.id">
-            <ItemPlayList :playListData="playList" @clickCard="handleClickCard" @mouseenter="() => showPlayListBtn(playList.id)" @mouseleave="() => hiddenPlayListBtn()" />
-          </SwiperSlide>
-        </Swiper>
-        <div ref="prevEl" class="swiper-button-prev custom-nav"></div>
-        <div ref="nextEl" class="swiper-button-next custom-nav"></div>
+        <template v-if="data.playListData.length > 6">
+          <Swiper
+            :modules="[Navigation]"
+            :slides-per-view="6"
+            :space-between="10"
+            :loop="true"
+            :navigation="navigationOptions"
+            class="mySwiper flex gap-3"
+          >
+            <SwiperSlide v-for="(playList, index) in data.playListData" :key="playList.id">
+              <ItemPlayList :playListData="playList" @clickCard="handleClickCard" @mouseenter="() => showPlayListBtn(playList.id)" @mouseleave="() => hiddenPlayListBtn()" />
+            </SwiperSlide>
+          </Swiper>
+          <div ref="prevEl" class="swiper-button-prev custom-nav"></div>
+          <div ref="nextEl" class="swiper-button-next custom-nav"></div>
+        </template>
+        <template v-else>
+          <div class="flex gap-3">
+            <ItemPlayList v-for="(playList, index) in data.playListData" :key="playList.id" :playListData="playList" @clickCard="handleClickCard" @mouseenter="() => showPlayListBtn(playList.id)" @mouseleave="() => hiddenPlayListBtn()" />
+          </div>
+        </template>
       </div>
     </div>
 

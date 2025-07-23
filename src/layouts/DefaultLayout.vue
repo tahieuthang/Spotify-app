@@ -2,8 +2,8 @@
   <div class="flex flex-col gap-4 h-screen w-full bg-black p-3 overflow-hidden">
     <TopNavbar />
     <div class="h-screen flex gap-3 overflow-hidden">
-      <SideBar class="w-1/3 overflow-y-auto" />
-      <div class="w-2/3 flex flex-col overflow-y-auto">
+      <SideBar class="w-1/4 overflow-y-auto" />
+      <div class="w-3/4 flex flex-col overflow-y-auto">
         <router-view :key="$route.fullPath"/>
       </div>
     </div>

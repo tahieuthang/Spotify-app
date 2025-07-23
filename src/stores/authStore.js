@@ -10,6 +10,7 @@ export const useCounterStore = defineStore('auth', {
     visiblePlayListBtn: null,
     isDropDown: false,
     open: false,
+    search: false,
     close: false,
     isPlaying: false,
     songs: JSON.parse(localStorage.getItem('ListSong')) || null,
@@ -25,6 +26,7 @@ export const useCounterStore = defineStore('auth', {
     isVisiblePlayList: (state) => state.visiblePlayListBtn,
     isClose: (state) => state.close,
     isOpen: (state) => state.open,
+    isSearch: (state) => state.search,
     isPlayingSong: (state) => state.isPlaying,
     allSongs: (state) => state.songs,
     currentSong: (state) => Array.isArray(state.songs) && state.songs.length > 0 ? state.songs[state.currentIndex] : null,
@@ -109,6 +111,9 @@ export const useCounterStore = defineStore('auth', {
     },
     setAudioRef(el) {
       this.audioRef = el
+    },
+    setisSearch(value) {
+      this.search = value
     },
     setisOpen(value) {
       this.open = value
