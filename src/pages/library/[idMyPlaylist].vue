@@ -33,26 +33,27 @@
             <th></th>
           </tr>
       </thead>
-      <tbody>
-          <tr v-for="(song, index) in data.listSong" :key="song.id" class="hover:bg-neutral-800 cursor-pointer"
-           @mouseenter="() => showSaveBtn(song.id)" @mouseleave="() => hiddenSaveBtn()" @click="playSong(index, data.listSong)">
-            <td class="font-semibold text-gray-500 text-2xl p-2 text-center pr-6" :class="{ '!text-green-500': currentSong.id == song.id && data.playListInfo.id == currentPlaylist }">{{ index + 1 }}</td>
+      <draggable v-model="data.listSong" item-key="id" tag="tbody" :ghost-class="'ghost-row'" @start="onDragStart" @end="onDragEnd">
+        <template #item="{ element, index }">
+          <tr :key="element.id" class="hover:bg-neutral-800 cursor-pointer" @mouseenter="() => showSaveBtn(element.id)" @mouseleave="() => hiddenSaveBtn()" @click="playSong(index, data.listSong)">
+            <td class="font-semibold text-gray-500 text-2xl p-2 text-center pr-6" :class="{ '!text-green-500': currentSong.id == element.id && data.playListInfo.id == currentPlaylist }">{{ index + 1 }}</td>
             <td class="p-2">
               <div class="flex gap-2 items-center">
                 <div class="w-13 h-13 bg-cover">
-                  <img :src="song.cover_url" class="rounded-lg" />
+                  <img :src="element.cover_url" class="rounded-lg" />
                 </div>
                 <div class="flex flex-col">
-                  <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong.id == song.id && data.playListInfo.id == currentPlaylist }">{{ song.song_name }}</p>
-                  <p class="font-semibold text-gray-500 text-lg">{{ song.author }}</p>
+                  <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong.id == element.id && data.playListInfo.id == currentPlaylist }">{{ element.song_name }}</p>
+                  <p class="font-semibold text-gray-500 text-lg">{{ element.author }}</p>
                 </div>
               </div>
             </td>
             <td></td>
-            <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ song.time }}</td>
-            <td class="w-[40px]"><button @click="(event) => { event.stopPropagation(); removePlaylist(song.id) }" v-show="visibleSave == song.id" class="border-none cursor-pointer"><i class="fa-solid fa-minus"></i></button></td>
+            <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ element.time }}</td>
+            <td class="w-[40px]"><button @click="(event) => { event.stopPropagation(); removePlaylist(element.id) }" v-show="visibleSave == element.id" class="border-none cursor-pointer"><i class="fa-solid fa-minus"></i></button></td>
           </tr>
-      </tbody>
+        </template>
+      </draggable>
     </table>
 
     <div class="flex justify-center items-center mt-3 mb-[-35px] w-full">
@@ -61,7 +62,9 @@
     <div class="flex flex-col gap-3">
       <p class="font-bold text-3xl">Hãy cùng tìm nội dung cho danh sách phát của bạn</p>
       <div class="flex items-center bg-neutral-800 text-white rounded-sm px-6 py-2 w-[725px] h-12">
-        <i class="fas fa-search text-neutral-400 text-xl mr-4 cursor-pointer hover:text-white transition"></i>
+        <button @click="handleClickSearch" class="border-none">
+          <i class="fas fa-search text-neutral-400 text-xl mr-4 cursor-pointer hover:text-white transition"></i>
+        </button>
         <input
           type="text"
           placeholder="Tìm kiếm bài hát"
@@ -87,6 +90,7 @@ import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vu
 import { useCounterStore } from '@/stores/authStore'
 import { useNotify } from '@/utils/useNotify'
 import { eventBus } from '@/utils/eventBus'
+import draggable from 'vuedraggable'
 
 const data = ref({
   playListInfo: {},
@@ -104,6 +108,8 @@ const { notify } = useNotify
 let visibleSave = computed(() => stores.isVisible)
 let isPlaying = computed(() => stores.isPlayingSong)
 let currentSong = computed(() => stores.currentSong)
+console.log(currentSong.value)
+
 let storeSong = computed(() => stores.allSongs)
 const audio = computed(() => stores.getAudioRef)
 const isOpen = computed(() => stores.isOpen)
@@ -135,7 +141,13 @@ const hiddenSaveBtn = () => {
   stores.setVisiblePlayBtn(null)
 }
 
-// const existItem = computed(() => data.playListInfo.song_id.length > 0)
+const onDragEnd = async () => {
+  stores.listSong(data.value.listSong)
+  await axios.patch(`/play-list/${idPlayList}`, {
+    song_id: data.value.listSong.map(song => song.id)
+  })
+  getPlayListData()
+}
 
 const playSong = (index, listSong) => {
   stores.play(true)
@@ -229,5 +241,13 @@ const openEdit = () => {
   stores.setisOpen(true)
 }
 </script>
+
+<style scoped>
+/* CSS để hiển thị hàng đang kéo */
+.ghost-row {
+  opacity: 0.5;
+  background-color: #171717;
+}
+</style>
 
 

@@ -4,9 +4,9 @@
       <div class="bg-cover">
         <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
       </div>
-      <div class="flex flex-col justify-end items-start gap-6">
+      <div class="flex flex-col justify-end items-start gap-3">
         <p class="font-bold text-lg">Danh sách phát công khai</p>
-        <p class="font-extrabold text-9xl whitespace-nowrap overflow-hidden overflow-ellipsis">{{ data.playListInfo.name }}</p>
+        <p class="font-extrabold text-7xl leading-[1.5] whitespace-nowrap overflow-hidden overflow-ellipsis">{{ data.playListInfo.name }}</p>
         <p class="font-bold text-gray-500">Của {{ data.ownerInfor.name }}</p>
         <div class="flex gap-3 items-center">
           <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" class="w-6 h-6" />
