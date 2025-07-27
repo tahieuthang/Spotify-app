@@ -88,7 +88,7 @@ const handlerFileChange = (e) => {
   const file = e.target.files[0]
   if(!file) return
   
-  const maxSize = 1 * 1024 * 1024
+  const maxSize = 2 * 1024 * 1024
   if(file.size > maxSize) {
     return
   }

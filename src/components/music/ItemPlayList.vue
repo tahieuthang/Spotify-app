@@ -1,7 +1,10 @@
 <template>
   <div @click="handleClickCard" class="flex flex-col gap-2 p-3 hover:rounded-xl hover:bg-neutral-800 max-h-[290px] relative">
-    <div class="w-40 h-40 bg-cover">
-      <img :src="playListData.cover_url" alt="cover" class="rounded-lg" />
+    <div v-if="playListData.cover_url != ''" class="w-40 h-40 bg-cover">
+      <img :src="playListData.cover_url" alt="cover" class="rounded-lg h-full w-full" />
+    </div>
+    <div v-else class="flex items-center justify-center w-40 h-40 bg-neutral-700 rounded-sm">
+      <i class="fa-solid fa-music text-5xl"></i>
     </div>
     <p class="font-medium text-lg text-white whitespace-nowrap overflow-hidden overflow-ellipsis">{{ playListData.name }}</p>
     <p class="font-medium text-lg text-gray-500">Của {{ ownerData.name }}</p>

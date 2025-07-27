@@ -1,8 +1,11 @@
 <template>
-  <div class="flex flex-col gap-15 bg-neutral-900 rounded-xl px-7 py-8">
+  <div v-loading="loadingState" class="flex flex-col gap-15 bg-[#111111] rounded-xl px-7 py-8">
     <div class="flex gap-8">
-      <div class="bg-cover">
+      <div v-if="data.playListInfo.cover_url != ''" class="bg-cover">
         <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
+      </div>
+      <div v-else class="flex items-center justify-center w-[280px] h-[280px] bg-neutral-700 rounded-sm">
+        <i class="fa-solid fa-music text-7xl"></i>
       </div>
       <div class="flex flex-col justify-end items-start gap-3">
         <p class="font-bold text-lg">Danh sách phát công khai</p>
@@ -10,7 +13,7 @@
         <p class="font-bold text-gray-500">Của {{ data.ownerInfor.name }}</p>
         <div class="flex gap-3 items-center">
           <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" class="w-6 h-6" />
-          <p class="font-bold text-gray-500"><span class="font-bold text-lg text-white">Spotify</span> &bull; 2230 lượt lưu &bull; 50 bài hát, khoảng 3 giờ 30 phút</p>
+          <p class="font-bold text-gray-500"><span class="font-bold text-lg text-white">Spotify</span> &bull; 2230 lượt lưu &bull; {{ data.playListInfo.song_id?.length || 0 }} bài hát</p>
         </div>
       </div>
       <div id="notification" class="hidden flex flex-col justify-start gap-2 bg-[#4cb3ff] rounded-xl p-5 h-32 w-100 fixed right-5 top-25 z-50">
@@ -26,8 +29,10 @@
         <i v-if="isPlaying && currentPlaylist === data.playListInfo.id" class="fa-solid fa-pause text-2xl text-black"></i>
         <i v-else class="fa-solid fa-play text-2xl text-black"></i>
       </button>
-      <i class="fa-regular fa-bookmark text-3xl cursor-pointer hover:scale-110"></i>
-      <i class="fa-solid fa-bookmark !hidden text-3xl cursor-pointer hover:scale-110"></i>
+      <!-- <button @click="savePlaylist" v-show="!isMyPlaylist" class="border-none cursor-pointer">
+        <i v-if="existSave(data.playListInfo.id)" class="fa-solid fa-bookmark text-3xl hover:scale-110"></i>
+        <i v-else class="fa-regular fa-bookmark text-3xl hover:scale-110"></i>
+      </button> -->
     </div>
 
     <table>
@@ -56,7 +61,7 @@
             </td>
             <td class="w-[40px]">
               <button v-if="existFav(song.id)" class="flex items-center justify-center w-5 h-5 rounded-full border-none bg-green-500 cursor-pointer"><i class="fa-solid fa-check text-xs text-black"></i></button>
-              <button v-else v-show="visibleSave == song.id" @click="(event) => { event.stopPropagation(); addFavSong(song.id); }" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
+              <button v-else v-show="visibleSave == song.id" @click.stop="addFavSong(song.id)" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
             </td>
             <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ song.time }}</td>
           </tr>
@@ -76,13 +81,16 @@ import { useNotify } from '@/utils/useNotify'
 
 const route = useRoute()
 const stores = useCounterStore()
+const userLogin = computed(() => stores.getUser)
 const audio = computed(() => stores.getAudioRef)
 const isAuthenticated = computed(() => stores.isLogged)
+const loadingState = ref(false)
 
 const data = ref({
   playListInfo: {},
   ownerInfor: {},
   listSong: [],
+  privatePlaylist: []
 })
 
 const getPlayListData = async () => {
@@ -93,6 +101,19 @@ const getPlayListData = async () => {
     getSongs(data.value.playListInfo.song_id)
   }
 }
+
+const getMyPlaylist = async () => {
+  const response = await axios.get('/play-list', {
+    params: {
+      owner_id: userLogin.value?.id
+    }
+  })
+  if(response) {
+    data.value.privatePlaylist = response.data.map(res => res.id)
+  }
+}
+
+const isMyPlaylist = computed(() => data.value.privatePlaylist.includes(data.value.playListInfo.id))
 
 const getSongs = async (songsId) => {
   const response = await axios.get('/songs')
@@ -131,7 +152,13 @@ const playSong = (index, listSong) => {
 }
 
 onMounted(async() => {
+  loadingState.value = true
+  await new Promise(resolve => setTimeout(resolve, 1000))
   getPlayListData()
+  if(isAuthenticated.value) {
+    getMyPlaylist()
+  }
+  loadingState.value = false
 })
 
 const currentPlaylist = computed(() => stores.currentPlaylist)
@@ -163,29 +190,35 @@ const playPlayList = () => {
 const { notify } = useNotify()
 const addFavSong = async (songId) => {
   if(isAuthenticated.value) { 
-    const userLogin = stores.getUser
-    if(!userLogin.favourite_song.includes(songId)) {
-      userLogin.favourite_song.push(songId)
+    if(!userLogin.value.favourite_song.includes(songId)) {
+      userLogin.value.favourite_song.push(songId)
     }
-    const response = await axios.patch(`/users/${userLogin.id}`, {
-      favourite_song: userLogin.favourite_song,
-    })
-    if(response.status == 200) {
-      notify('Đã thêm vào bài hát yêu thích', 'success')
-      const newInfoUser = {
-        id: userLogin.id,
-        name: userLogin.name,
-        password: userLogin.password,
-        favourite_song: userLogin.favourite_song
+    console.log(userLogin.value.favourite_song);
+    try {
+      const response = await axios.patch(`/users/${userLogin.value.id}`, {
+        favourite_song: userLogin.value.favourite_song,
+      })
+      console.log(response);
+      
+      if(response.status == 200) {
+        notify('Đã thêm vào bài hát yêu thích', 'success')
+        const newInfoUser = {
+          id: userLogin.value.id,
+          name: userLogin.value.name,
+          password: userLogin.value.password,
+          favourite_song: userLogin.value.favourite_song,
+          save_playlist: userLogin.value.save_playlist
+        }
+        stores.setUser(newInfoUser)
       }
-      stores.setUser(newInfoUser)
+    } catch(e) {
+      console.log(e)
     }
   } else {
     document.getElementById('notification').classList.remove('hidden')
   }
 }
 
-const userLogin = computed(() => stores.getUser)
 const existFav = (id) => {
   if(isAuthenticated.value) {
     if(userLogin.value?.favourite_song.includes(id)) {
@@ -195,6 +228,56 @@ const existFav = (id) => {
     return false
   }
 }
+
+// const existSave = (playlistId) => {
+//   if(isAuthenticated.value) {
+//     console.log(userLogin.value.save_playlist);
+    
+//     if(userLogin.value?.save_playlist.includes(playlistId)) {
+//       return true
+//     } else {
+//       return false
+//     }
+//   }
+// }
+
+// const savePlaylist = async () => {
+//   if(isAuthenticated.value) {
+//     if(!existSave(data.value.playListInfo.id)) {
+//       const newSaves = userLogin.value?.save_playlist.push(data.value.playListInfo.id)
+//       const response = await axios.patch(`/users/${userLogin.value.id}`, {
+//         save_playlist: newSaves
+//       })
+//       if(response.status == 200) {
+//         notify('Đã thêm danh sách phát yêu thích', 'success')
+//         const newInfoUser = {
+//           id: userLogin.value.id,
+//           name: userLogin.value.name,
+//           password: userLogin.value.password,
+//           favourite_song: userLogin.value.favourite_song,
+//           save_playlist: userLogin.value.save_playlist
+//         }
+//         stores.setUser(newInfoUser)
+//       }
+//     } else {
+//       const newSaves = userLogin.value?.save_playlist.filter(item => item.id != data.value.playListInfo.id)
+//       const response = await axios.patch(`/users/${userLogin.value.id}`, {
+//         save_playlist: newSaves
+//       })
+//       if(response.status == 200) {
+//         notify('Xóa danh sách phát yêu thích', 'success')
+//         const newInfoUser = {
+//           id: userLogin.id,
+//           name: userLogin.name,
+//           password: userLogin.password,
+//           favourite_song: userLogin.favourite_song,
+//           save_playlist: userLogin.save_playlist
+//         }
+//         stores.setUser(newInfoUser)
+//       }
+//     }
+//   }
+// }
 
 const closeX = () => {
   const state = !stores.isClose

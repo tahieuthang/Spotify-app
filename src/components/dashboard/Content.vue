@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-15 bg-neutral-900 rounded-xl px-12 py-10">
+  <div v-loading="loadingState" class="flex flex-col gap-15 bg-neutral-900 rounded-xl px-12 py-10">
     <div class="flex flex-col gap-5">
       <p class="text-3xl font-bold">Những bài hát thịnh hành</p>
       <div class="relative">
@@ -73,6 +73,7 @@ const data = ref({
   playListData: []
 })
 const stores = useCounterStore()
+const loadingState = ref(false)
 
 const getSongData = async () => {
   const response = await axios.get('/songs')
@@ -93,12 +94,15 @@ const nextEl = ref(null)
 const navigationOptions = ref({})
 
 onMounted(async() => {
+  loadingState.value = true
+  await new Promise(resolve => setTimeout(resolve, 1000))
   getSongData()
   getPlayListData()
   navigationOptions.value = {
     prevEl: prevEl.value,
     nextEl: nextEl.value,
   }
+  loadingState.value = false
 })
 
 // Ẩn nút play icon

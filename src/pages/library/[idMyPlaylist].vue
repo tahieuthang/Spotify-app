@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-15 bg-neutral-900 rounded-xl px-8 py-9">
+  <div v-loading="loadingState" class="flex flex-col gap-15 bg-[#111111] rounded-xl px-8 py-9">
     <div @click="openEdit" class="flex gap-8 cursor-pointer">
       <div v-if="data.playListInfo.cover_url" class="bg-cover">
         <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
@@ -101,6 +101,7 @@ const data = ref({
 
 const route = useRoute()
 const idPlayList = route.params.idMyPlaylist
+const loadingState = ref(false)
 const stores = useCounterStore()
 const userLogin = computed(() => stores.getUser)
 const { notify } = useNotify
@@ -108,7 +109,6 @@ const { notify } = useNotify
 let visibleSave = computed(() => stores.isVisible)
 let isPlaying = computed(() => stores.isPlayingSong)
 let currentSong = computed(() => stores.currentSong)
-console.log(currentSong.value)
 
 let storeSong = computed(() => stores.allSongs)
 const audio = computed(() => stores.getAudioRef)
@@ -156,8 +156,11 @@ const playSong = (index, listSong) => {
   stores.playlistId(data.value.playListInfo.id)
 }
 
-onMounted(() => {
+onMounted(async() => {
+  loadingState.value = true
+  await new Promise(resolve => setTimeout(resolve, 400))
   getPlayListData()
+  loadingState.value = false
 })
 
 const currentPlaylist = computed(() => stores.currentPlaylist)
@@ -247,6 +250,13 @@ const openEdit = () => {
 .ghost-row {
   opacity: 0.5;
   background-color: #171717;
+}
+.v-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
 }
 </style>
 

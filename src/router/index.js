@@ -41,7 +41,15 @@ const router = createRouter({
       name: 'play-list',
       component: () => import('@/pages/play-list/[idPlayList].vue'),
       meta: {
-        requiresAuth: true,
+        requiresAuth: false,
+      }
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('@/pages/search/index.vue'),
+      meta: {
+        requiresAuth: false,
       }
     },
     {

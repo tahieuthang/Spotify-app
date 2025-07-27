@@ -3,8 +3,9 @@ import { defineStore } from 'pinia';
 export const useCounterStore = defineStore('auth', {
   state: () => ({
     auth: localStorage.getItem('Authorization') || null,
-    userInfo: JSON.parse(localStorage.getItem('userInfo')),
+    userInfo: JSON.parse(localStorage.getItem('userInfo')) || null,
     dataSearch: [],
+    playlistSearch: [],
     keySearch: "",
     visiblePlayBtn: null,
     visiblePlayListBtn: null,
@@ -39,6 +40,9 @@ export const useCounterStore = defineStore('auth', {
     getDataSearch(state) {
       return state.dataSearch
     },
+    getPlaylistSearch(state) {
+      return state.playlistSearch
+    },
     getKeySearch(state) {
       return state.keySearch
     },
@@ -50,17 +54,19 @@ export const useCounterStore = defineStore('auth', {
     },
   },
   actions: {
-    setToken(token) {
-      this.token = token
+    setAuth(value) {
+      this.auth = value
+      localStorage.setItem('Authorization', value)
     },
     setUser(user) {
-      this.auth = true
       this.userInfo = user
       localStorage.setItem('userInfo', JSON.stringify(user))
-      localStorage.setItem('Authorization', true)
     },
     setDataSearch(dataSearch) {
       this.dataSearch = dataSearch
+    },
+    setPlaylistSearch(dataSearch) {
+      this.playlistSearch = dataSearch
     },
     setKeySearch(keySearch) {
       this.keySearch = keySearch

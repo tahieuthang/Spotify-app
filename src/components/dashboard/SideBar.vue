@@ -1,6 +1,6 @@
 <template>
   <!-- Sidebar trước khi login or chưa tạo playlist nào -->
-  <div v-if="!isAuthenticated" class="flex flex-col gap-15 bg-neutral-900 rounded-xl px-3 py-7">
+  <div v-if="!isAuthenticated" class="flex flex-col gap-15 bg-[#111111] rounded-xl px-3 py-7">
     <div class="flex justify-between mx-7">
       <p class="font-bold text-xl">Thư viện</p>
       <i class="fa-solid fa-plus text-2xl text-gray-500"></i>
@@ -8,7 +8,7 @@
     <div class="flex flex-col justify-start bg-neutral-800 rounded-xl px-6 py-5 gap-2">
       <p class="font-bold text-xl">Tạo danh sách đầu tiên của bạn</p>
       <p class="font-bold text-sm mb-4">Rất dễ! Chúng tôi sẽ giúp bạn</p>
-      <button class="flex justify-center items-center rounded-full p-4 bg-white w-[200px] h-[38px] cursor-pointer transform hover:scale-102">
+      <button @click="openNotification" class="flex justify-center items-center rounded-full p-4 bg-white w-[200px] h-[38px] cursor-pointer transform hover:scale-102">
         <span class="text-black font-bold text-lg">Tạo danh sách phát</span>
       </button>
     </div>
@@ -20,10 +20,17 @@
         <span class="text-black font-bold text-lg">Duyệt xem podcast</span>
       </button>
     </div>
+    <div id="creatplaylist" class="hidden flex flex-col justify-start gap-2 bg-[#4cb3ff] rounded-xl p-5 h-32 w-100 fixed right-5 top-25 z-50">
+      <div class="flex justify-between items-center">
+        <p class="font-bold text-black text-xl">Bạn đã đăng xuất</p>
+        <button @click="closeX" class="border-none cursor-pointer"><i class="fa-solid fa-xmark text-black text-2xl"></i></button>
+      </div>
+      <p class="font-semibold text-black text-lg">Đăng nhập để tạo danh sách phát của riêng bạn.</p>
+    </div>
   </div>
 
   <!-- Sidebar sau khi login or đã tạo playlist -->
-  <div v-else class="flex flex-col gap-1 bg-neutral-900 rounded-xl px-3 py-7">
+  <div v-else class="flex flex-col gap-1 bg-[#111111] rounded-xl px-3 py-7">
     <div class="flex justify-between mx-2 mb-8">
       <p class="font-bold text-xl">Thư viện</p>
     </div>
@@ -85,19 +92,24 @@ const createPlaylist = async () => {
 }
 
 const getPlayListData = async () => {
-  const response = await axios.get('/play-list')
+  const response = await axios.get('/play-list', {
+    params: {
+      owner_id: userLogin.value?.id
+    }
+  })
   if(response) {
     playlistData.value = response.data
   }
 }
 
 const eventHandlers = {
-  callApi: () => getPlayListData(),
-  activePlaylist: () => fetchUserData(),
+  callApi: () => getPlayListData()
 }
 
 onMounted(() => {
-  getPlayListData()
+  if(isAuthenticated.value) {
+    getPlayListData()
+  }
   for (const [eventName, handler] of Object.entries(eventHandlers)) {
     eventBus.on(eventName, handler)
   }
@@ -111,5 +123,18 @@ onBeforeMount(() => {
 
 const openPlaylist = (id) => {
   router.push(`/library/${id}`)
+}
+
+const isOpen = ref(false)
+
+const openNotification = () => {
+  document.getElementById('creatplaylist').classList.remove('hidden')
+}
+
+const closeX = () => {
+  const state = !isOpen.value
+  if(state) {
+    document.getElementById('creatplaylist').classList.add('hidden')
+  }
 }
 </script>

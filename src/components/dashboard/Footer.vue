@@ -30,13 +30,13 @@
       </div>
       <div class="flex flex-1 justify-end gap-5">
         <div class="cursor-pointer">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="h-8 w-8" />
+          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" alt="Instagram" width="32" height="32">
         </div>
         <div class="cursor-pointer">
-          <img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/60/Twitter_bird_logo_2012.svg/1200px-Twitter_bird_logo_2012.svg.png" alt="Twitter" class="h-8 w-8" />
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter X" width="32" height="32">
         </div>
         <div class="cursor-pointer">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="h-8 w-8" />
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" width="32" height="32">
         </div>
       </div>
     </div>

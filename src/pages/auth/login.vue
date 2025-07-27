@@ -79,11 +79,16 @@ const onSubmit = handleSubmit(async (values) => {
   loadingState.value = true
   try {
     const response = await axios.get('/users')
+    console.log("all", response);
+    
     if(response) {
       const user = response.data.find((res) => res.name === values.name && res.password === values.password)
+      console.log(user);
+      
       if(user) {
         router.push('/')
         notify('Đăng ký thành công', 'success')
+        stores.setAuth(true)
         stores.setUser(user)
       }
     }

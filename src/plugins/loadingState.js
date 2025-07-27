@@ -1,9 +1,14 @@
 const elLoading = `
-  <div class="w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>`;
-
+  <div id="getting" class="absolute inset-0 z-70 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="flex space-x-2">
+      <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+      <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+      <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-bounce"></div>
+    </div>
+  </div>
+`;
 export default {
   mounted(el, binding) {
-    // Khi binding.value là true, hiển thị loading
     if (binding.value && !el.querySelector('#getting')) {
       el.classList.add('relative');
       el.insertAdjacentHTML('beforeend', elLoading);
@@ -11,12 +16,10 @@ export default {
   },
   
   updated(el, binding) {
-    // Kiểm tra khi giá trị binding thay đổi
     if (binding.value === binding.oldValue) return;
 
-    // Nếu binding.value là true, thêm loading, ngược lại thì xóa
     const loadingEl = el.querySelector('#getting');
-    
+
     if (binding.value && !loadingEl) {
       el.classList.add('relative');
       el.insertAdjacentHTML('beforeend', elLoading);
@@ -25,9 +28,7 @@ export default {
     }
   },
 
-  // Tùy chỉnh cho SSR (Server-side rendering) nếu cần
   getSSRProps(binding, vnode) {
-    console.log(binding, vnode);
     return {};
   }
 };

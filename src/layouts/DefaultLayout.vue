@@ -22,8 +22,7 @@ import MusicPlayerBar from '@/components/dashboard/MusicPlayerBar.vue'
 
 <style scoped>
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 1px;
+    width: 3px;
   }
 
   ::-webkit-scrollbar-track {

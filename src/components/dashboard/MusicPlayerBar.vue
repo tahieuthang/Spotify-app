@@ -19,7 +19,7 @@
         </button>
         <i @click="nextSong" class="fa-solid fa-forward-step text-2xl text-gray-400 hover:text-white cursor-pointer"></i>
       </div>
-      <input type="range" class="w-[500px]" min="0" :max="duration" step="0.1" :value="progress" @input="seek">
+      <input type="range" class="w-[500px] appearance-none custom-range" min="0" :max="duration" step="0.1" :value="progress" @input="seek" :style="trackStyle">
     </div>
     <div class="flex justify-end items-center gap-3 flex-1">
       <i class="fa-solid fa-volume-low"></i>
@@ -47,8 +47,8 @@ let allSongs = computed(() => stores.allSongs)
 let currentSong = computed(() => stores.currentSong)
 let isVolumne = computed(() => stores.isVolumne)
 const volume = ref(1)
-const duration = ref(null)
-const progress = ref(null)
+const duration = ref(0)
+const progress = ref(0)
 
 // Change nhạc mới
 watch(currentSong, (newSong) => {
@@ -120,13 +120,21 @@ const handleEnded = () => {
   }
 }
 
+const trackStyle = computed(() => {
+  const pct = duration.value ? (progress.value / duration.value) * 100 : 0;
+  return {
+    background: `linear-gradient(to right, #22c55e ${pct}%, #404040 ${pct}%)`
+  }
+})
+
+
 onMounted(() => {
   nextTick(() => {
     stores.setAudioRef(localAudioRef.value)
     if(audio.value) {
       audio.value.volume = volume.value
       audio.value.addEventListener('loadedmetadata', () => {
-        duration.value = audio.value.duration
+        duration.value = audio.value.duration || 1
       })
       audio.value.addEventListener('timeupdate', () => {
         progress.value = audio.value.currentTime
@@ -136,3 +144,43 @@ onMounted(() => {
   })
 })
 </script>
+
+<style scoped>
+.range-input {
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #404040;
+}
+
+.range-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-top: -4px; /* canh giữa */
+}
+
+.range-input:hover::-webkit-slider-thumb,
+.range-input:active::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.range-input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.range-input:hover::-moz-range-thumb,
+.range-input:active::-moz-range-thumb {
+  opacity: 1;
+}
+
+</style>
