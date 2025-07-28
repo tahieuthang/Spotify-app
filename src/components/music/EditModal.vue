@@ -22,7 +22,7 @@
           <input ref="fileInput" type="file" class="hidden" @change="handlerFileChange" accept="image/png, image/jpeg" >
           <div class="flex flex-grow flex-col gap-2">
             <input class="h-13 p-3 rounded-sm border-1 border-gray-500 font-bold placeholder:font-bold bg-neutral-800 focus:outline-none focus:bg-neutral-700" type="text" v-model="playlistClone.name" placeholder="Thêm tên">
-            <input class="flex justify-start items-start px-1 py-2 h-full rounded-sm border-1 border-gray-500 placeholder:font-bold focus:outline-none focus:bg-neutral-700 bg-transparent" type="text" placeholder="Thêm mô tả không bắt buộc">
+            <textarea class="flex justify-start p-3 h-full rounded-sm border-1 border-gray-500 font-bold focus:outline-none focus:bg-neutral-700 bg-transparent" type="text" placeholder="Thêm mô tả không bắt buộc"></textarea>
           </div>
         </div>
         <div class="flex justify-end mt-2">

@@ -42,7 +42,7 @@
 
       <!-- Khi đã đăng nhập -->
      <div class="flex justify-center items-center gap-4" v-if="isAuthenticated">
-        <i class="fa-solid fa-bell text-white text-xl"></i>
+        <i class="fa-solid fa-bell text-white text-xl cursor-pointer"></i>
 
         <!-- Group hover wrapper -->
         <div class="relative group">

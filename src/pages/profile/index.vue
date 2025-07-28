@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col gap-15 bg-gradient-to-b from-neutral-600 to-black rounded-xl px-7 py-8 ">
     <div class="flex gap-8">
-      <div class="w-[250px] h-[250px] bg-cover">
-        <img :src="ngotImg" alt="ngot" class="rounded-full" />
+      <div class="w-[250px] h-[250px] rounded-full bg-neutral-900 flex justify-center items-center shadow-lg">
+        <i class="fa-solid fa-user text-6xl"></i>
       </div>
       <div class="flex flex-col justify-end items-start gap-5">
         <p class="font-bold text-lg">Hồ sơ</p>
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <table>
+    <table v-if="favSongs != ''">
       <thead>
           <tr class="border-b border-gray-700">
             <th class="font-semibold text-gray-500 text-xl text-center">#</th>

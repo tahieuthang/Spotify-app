@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loadingState" class="flex flex-col gap-15 bg-[#111111] rounded-xl px-8 py-9">
+  <div v-loading="loadingState" class="flex flex-col gap-12 bg-[#111111] rounded-xl px-8 py-9">
     <div @click="openEdit" class="flex gap-8 cursor-pointer">
       <div v-if="data.playListInfo.cover_url" class="bg-cover">
         <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
@@ -15,23 +15,27 @@
         </div>
       </div>
     </div>
+    <!-- <div class="flex justify-center items-center">
+      <hr class="border-neutral-700 w-full">
+    </div> -->
     <div @click="closeEdit" v-if="isOpen" id="overlay" class="fixed inset-0 bg-black opacity-70"></div>
     <EditModal v-if="isOpen" :playlistData="data.playListInfo" @callApi="getPlayListData"/>
+
     <div class="flex gap-4 items-center mb-1">
-      <button @click="playPlayList" class="flex justify-center items-center rounded-full w-15 h-15 bg-green-500 hover:scale-105 hover:bg-green-400 cursor-pointer">
+      <button @click="playPlayList" :disabled="data.listSong == ''" class="flex justify-center items-center rounded-full w-15 h-15 bg-green-500 hover:scale-105 hover:bg-green-400 cursor-pointer">
         <i v-if="isPlaying && currentPlaylist === data.playListInfo.id" class="fa-solid fa-pause text-2xl text-black"></i>
         <i v-else class="fa-solid fa-play text-2xl text-black"></i>
       </button>
     </div>
-    <table>
+    <table v-if="data.listSong != ''">
       <thead>
-          <tr class="border-b border-gray-700">
-            <th class="font-semibold text-gray-500 text-xl text-center">#</th>
-            <th class="font-semibold text-gray-500 text-lg">Tiêu đề</th>
-            <th></th>
-            <th class="text-center"><i class="fa-regular fa-clock font-semibold text-gray-500 text-lg"></i></th>
-            <th></th>
-          </tr>
+        <tr class="border-b border-gray-700">
+          <th class="font-semibold text-gray-500 text-xl text-center">#</th>
+          <th class="font-semibold text-gray-500 text-lg">Tiêu đề</th>
+          <th></th>
+          <th class="text-center"><i class="fa-regular fa-clock font-semibold text-gray-500 text-lg"></i></th>
+          <th></th>
+        </tr>
       </thead>
       <draggable v-model="data.listSong" item-key="id" tag="tbody" :ghost-class="'ghost-row'" @start="onDragStart" @end="onDragEnd">
         <template #item="{ element, index }">
@@ -251,12 +255,9 @@ const openEdit = () => {
   opacity: 0.5;
   background-color: #171717;
 }
-.v-loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
+button:disabled {
+  background-color: #38a169;
+  cursor: not-allowed;
 }
 </style>
 

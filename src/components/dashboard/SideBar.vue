@@ -43,7 +43,7 @@
       </button>
     </div>
     <div class="flex flex-col cursor-pointer" v-for="(playlist, index) in playlistData" :key="playlist?.id" @click="openPlaylist(playlist.id)">
-      <div class="flex gap-3 items-center hover:bg-neutral-800 p-3 hover:rounded-xl" :class="{ 'bg-neutral-800 rounded-xl': playlist.id == route.params.idMyPlaylist }">
+      <div @contextmenu.prevent="openDelete" class="flex gap-3 items-center hover:bg-neutral-800 p-3 hover:rounded-xl" :class="{ 'bg-neutral-800 rounded-xl': playlist.id == route.params.idMyPlaylist }">
         <div v-if="playlist.cover_url" class="bg-cover">
           <img :src="playlist?.cover_url" alt="ngot" class="rounded-lg w-16 h-16" />
         </div>
