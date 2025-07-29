@@ -101,6 +101,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 
+const router = useRouter()
 const stores = useCounterStore()
 const isAuthenticated = computed(() => stores.isLogged)
 const data = ref({
@@ -189,5 +190,9 @@ const closeX = () => {
   if(state) {
     document.getElementById('notification').classList.add('hidden')
   }
+}
+
+const handleClickCard = (playlistId) => {
+  router.push(`/play-list/${playlistId}`)
 }
 </script>
