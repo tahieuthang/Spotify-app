@@ -69,7 +69,7 @@ router.beforeEach(async (to, from, next) => {
   const isLogged = stores.isLogged
   // next-line: check if route ("to" object) needs authenticated
   if (to.matched.some((record) => record.meta.requiresAuth) && !isLogged) {
-    next({ name: "login" });
+    next({ name: "dashboard" });
   } else if (isLogged) {
     switch (to.name) {
       case "login":
