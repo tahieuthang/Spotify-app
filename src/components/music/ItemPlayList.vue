@@ -6,7 +6,7 @@
     <div v-else class="flex items-center justify-center w-40 h-40 bg-neutral-700 rounded-sm">
       <i class="fa-solid fa-music text-5xl"></i>
     </div>
-    <p class="font-medium text-lg text-white whitespace-nowrap overflow-hidden overflow-ellipsis">{{ playListData.name }}</p>
+    <p class="font-medium text-lg text-white whitespace-nowrap overflow-hidden overflow-ellipsis max-w-40">{{ playListData.name }}</p>
     <p class="font-medium text-lg text-gray-500">Của {{ ownerData.name }}</p>
     <button v-show="isVisible === playListData.id" class="rounded-full w-13 h-13 p-2 bg-green-500 absolute left-30 top-30 hover:scale-105 hover:bg-green-400 cursor-pointer"><i class="fa-solid fa-play text-xl text-black"></i></button>
   </div>

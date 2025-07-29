@@ -108,6 +108,7 @@ const logout = () => {
     localStorage.removeItem('userInfo')
   }
   location.reload()
+  router.push('/')
 }
 
 const goHome = () => {
