@@ -5,11 +5,21 @@
       <div class="relative">
         <Swiper
           :modules="[Navigation]"
-          :slides-per-view="6"
           :space-between="10"
           :loop="true"
           :navigation="navigationOptions"
           class="mySwiper flex gap-3"
+          :breakpoints="{
+            0: {
+              slidesPerView: 2
+            },
+            768: {
+              slidesPerView: 4
+            },
+            1024: {
+              slidesPerView: 6
+            }
+          }"
         >
           <SwiperSlide v-for="(song, index) in data.songsData" :key="song.id">
             <ItemSong :songData="song" @clickSong="handleClickSong" @mouseenter="() => showPlayBtn(song.id)" @mouseleave="() => hiddenPlayBtn()" />
