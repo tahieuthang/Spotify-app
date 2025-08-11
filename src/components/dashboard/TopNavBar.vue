@@ -90,12 +90,17 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotify } from '@/utils/useNotify'
 import { useCounterStore } from '@/stores/authStore'
+import removeAccents from 'remove-accents'
+import levenshtein from 'js-levenshtein'
 
 const data = ref({
   playListInfo: {},
   listSong: [],
   keySearch: "",
   dataSearch: []
+})
+const newKeySearch = computed(() => {
+  return removeAccents(data.value.keySearch)
 })
 const stores = useCounterStore()
 const isAuthenticated = computed(() => stores.isLogged)
@@ -115,7 +120,7 @@ const goHome = () => {
 }
 
 const handleClickSearch = async () => {
-  await handleSearch(data.value.keySearch)
+  await handleSearch(newKeySearch.value)
 }
 
 const handleSearch = async (keySearch) => {
@@ -142,6 +147,7 @@ const handleSearch = async (keySearch) => {
 const searchSong = (response, keySearch) => {
   const songArray = response.data
   let keyArray = keySearch.replace(/\s+/g, '').toLowerCase().split('')
+  if(keyArray.length < 3) {
     for(const song of songArray) {
       let songName = song.song_name.replace(/\s+/g, '').toLowerCase().split('')
       let found = false
@@ -155,16 +161,51 @@ const searchSong = (response, keySearch) => {
         data.value.dataSearch.push(song)
       }
     }
-    if(data.value.dataSearch.length > 0) {
-      stores.setDataSearch(data.value.dataSearch)
-      stores.setKeySearch(keySearch)
-      searchPlaylist(data.value.dataSearch[0].id)
-    } else {
-      stores.setDataSearch([])
-      stores.setKeySearch(keySearch)
+  } else {
+    const result = fuzzySearch(keySearch, response)
+    console.log(result)
+    
+    if(result.length > 0) {
+      result.forEach(element => {
+        data.value.dataSearch.push(element)
+      });
     }
+  }
+  console.log(data.value.dataSearch);
+  
+  if(data.value.dataSearch.length > 0) {
+    stores.setDataSearch(data.value.dataSearch)
+    stores.setKeySearch(keySearch)
+    searchPlaylist(data.value.dataSearch[0].id)
+  } else {
+    stores.setDataSearch([])
+    stores.setKeySearch(keySearch)
+  }
 }
 
+// Thực hiện tìm kiếm gần đúng (fuzzy search) dựa trên Levenshtein distance.
+//   - Ưu tiên kết quả khớp tuyệt đối (distance = 0)
+//   - Giữ lại các kết quả gần đúng trong giới hạn `threshold`
+const fuzzySearch = (keySearch, response) => {
+  const threshold = 3
+  const searchWords = keySearch.toLowerCase().split(/\s|\(|\)/).filter(Boolean)
+  const result = response.data.map(song => {
+    const songName = song.song_name.toLowerCase().split(/\s|\(|\)/).filter(Boolean)
+    let bestDistance = Infinity
+    for(const searchWord of searchWords) {
+      for(const word of songName) {
+        const distance = levenshtein(searchWord, word)
+        if(distance < bestDistance) {
+          bestDistance = distance
+        }
+      }
+    }
+    return { song, bestDistance  }
+  }).filter(item => item.bestDistance  <= threshold).sort((a, b) => a.bestDistance - b.bestDistance)
+  return result.map(item => item.song)
+}
+
+// Search các playlist chứa bài hát đầu tiên của data search
 const searchPlaylist = async (songId) => {
   const response = await axios.get('/play-list')
   if(response) {

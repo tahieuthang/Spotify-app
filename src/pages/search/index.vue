@@ -126,7 +126,11 @@ onMounted(async() => {
 watch([() => stores.getDataSearch, () => stores.getPlaylistSearch, () => stores.getKeySearch], async ([newData, newPlaylist, newKey]) => {
   loadingState.value = true
   await new Promise(resolve => setTimeout(resolve, 1000))
-  data.value.dataSearch = [...newData].slice(0, 4)
+  if(newData.length > 4) {
+    data.value.dataSearch = [...newData].slice(0, 4)
+  } else {
+    data.value.dataSearch = [...newData]
+  }
   data.value.relatedPlaylist = [...newPlaylist]
   data.value.keySearch = newKey
   loadingState.value = false
