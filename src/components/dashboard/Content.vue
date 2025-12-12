@@ -7,7 +7,8 @@
           :modules="[Navigation]"
           :space-between="10"
           :loop="true"
-          :navigation="navigationOptions"
+          :navigation="true"
+          @swiper="onSwiperSong"
           class="mySwiper flex gap-3"
           :breakpoints="{
             0: {
@@ -25,8 +26,8 @@
             <ItemSong :songData="song" @clickSong="handleClickSong" @mouseenter="() => showPlayBtn(song.id)" @mouseleave="() => hiddenPlayBtn()" />
           </SwiperSlide>
         </Swiper>
-        <div ref="prevEl" class="swiper-button-prev custom-nav"></div>
-        <div ref="nextEl" class="swiper-button-next custom-nav"></div>
+        <div ref="prevElSong" class="swiper-button-prev custom-nav"></div>
+        <div ref="nextElSong" class="swiper-button-next custom-nav"></div>
       </div>
     </div>
 
@@ -39,15 +40,16 @@
             :slides-per-view="6"
             :space-between="10"
             :loop="true"
-            :navigation="navigationOptions"
+            :navigation="true"
+            @swiper="onSwiperPlaylist"
             class="mySwiper flex gap-3"
           >
             <SwiperSlide v-for="(playList, index) in data.playListData" :key="playList.id">
               <ItemPlayList :playListData="playList" @clickCard="handleClickCard" @mouseenter="() => showPlayListBtn(playList.id)" @mouseleave="() => hiddenPlayListBtn()" />
             </SwiperSlide>
           </Swiper>
-          <div ref="prevEl" class="swiper-button-prev custom-nav"></div>
-          <div ref="nextEl" class="swiper-button-next custom-nav"></div>
+          <div ref="prevElPlaylist" class="swiper-button-prev custom-nav"></div>
+          <div ref="nextElPlaylist" class="swiper-button-next custom-nav"></div>
         </template>
         <template v-else>
           <div class="flex gap-3">
@@ -66,7 +68,7 @@ import ItemSong from '@/components/music/ItemSong.vue'
 import ItemPlayList from '@/components/music/ItemPlayList.vue'
 import Footer from '@/components/dashboard/Footer.vue'
 import axios from '@/utils/axios'
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotify } from '@/utils/useNotify'
 import { useCounterStore } from '@/stores/authStore'
@@ -99,19 +101,95 @@ const getPlayListData = async () => {
   }
 }
 
-const prevEl = ref(null)
-const nextEl = ref(null)
-const navigationOptions = ref({})
+const prevElSong = ref(null)
+const nextElSong = ref(null)
+const prevElPlaylist = ref(null)
+const nextElPlaylist = ref(null)
+const swiperSong = ref(null)
+const swiperPlaylist = ref(null)
+
+const onSwiperSong = (swiper) => {
+  swiperSong.value = swiper
+  // Setup navigation sau khi Swiper và refs đã sẵn sàng
+  nextTick(() => {
+    const setupNavigation = () => {
+      if (swiper && prevElSong.value && nextElSong.value) {
+        // Update navigation params
+        if (swiper.params.navigation) {
+          swiper.params.navigation.prevEl = prevElSong.value
+          swiper.params.navigation.nextEl = nextElSong.value
+        } else {
+          swiper.params.navigation = {
+            prevEl: prevElSong.value,
+            nextEl: nextElSong.value,
+          }
+        }
+        // Re-init navigation
+        if (swiper.navigation) {
+          swiper.navigation.init()
+          swiper.navigation.update()
+        }
+      } else {
+        // Nếu refs chưa sẵn sàng, thử lại sau
+        setTimeout(setupNavigation, 50)
+      }
+    }
+    setupNavigation()
+  })
+}
+
+const onSwiperPlaylist = (swiper) => {
+  swiperPlaylist.value = swiper
+  // Setup navigation sau khi Swiper và refs đã sẵn sàng
+  nextTick(() => {
+    const setupNavigation = () => {
+      if (swiper && prevElPlaylist.value && nextElPlaylist.value) {
+        // Update navigation params
+        if (swiper.params.navigation) {
+          swiper.params.navigation.prevEl = prevElPlaylist.value
+          swiper.params.navigation.nextEl = nextElPlaylist.value
+        } else {
+          swiper.params.navigation = {
+            prevEl: prevElPlaylist.value,
+            nextEl: nextElPlaylist.value,
+          }
+        }
+        // Re-init navigation
+        if (swiper.navigation) {
+          swiper.navigation.init()
+          swiper.navigation.update()
+        }
+      } else {
+        // Nếu refs chưa sẵn sàng, thử lại sau
+        setTimeout(setupNavigation, 50)
+      }
+    }
+    setupNavigation()
+  })
+}
 
 onMounted(async() => {
   loadingState.value = true
   await new Promise(resolve => setTimeout(resolve, 1000))
   getSongData()
   getPlayListData()
-  navigationOptions.value = {
-    prevEl: prevEl.value,
-    nextEl: nextEl.value,
+  
+  // Đợi DOM render xong và update navigation
+  await nextTick()
+  if (swiperSong.value && prevElSong.value && nextElSong.value) {
+    swiperSong.value.params.navigation.prevEl = prevElSong.value
+    swiperSong.value.params.navigation.nextEl = nextElSong.value
+    swiperSong.value.navigation.init()
+    swiperSong.value.navigation.update()
   }
+  
+  if (swiperPlaylist.value && prevElPlaylist.value && nextElPlaylist.value) {
+    swiperPlaylist.value.params.navigation.prevEl = prevElPlaylist.value
+    swiperPlaylist.value.params.navigation.nextEl = nextElPlaylist.value
+    swiperPlaylist.value.navigation.init()
+    swiperPlaylist.value.navigation.update()
+  }
+  
   loadingState.value = false
 })
 
@@ -158,6 +236,12 @@ const handleClickSong = async (songId) => {
   width: 40px;
   height: 40px;
   color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.custom-nav:hover {
+  background-color: #374151;
 }
 
 .swiper-button-prev::after,
