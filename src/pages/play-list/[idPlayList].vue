@@ -45,23 +45,23 @@
           </tr>
       </thead>
       <tbody>
-          <tr v-for="(song, index) in data.listSong" :key="song.id" class="hover:bg-neutral-800 cursor-pointer"
-           @mouseenter="() => showSaveBtn(song.id)" @mouseleave="() => hiddenSaveBtn()" @click="playSong(index, data.listSong)">
-            <td class="font-semibold text-gray-500 text-2xl p-2 text-center pr-6" :class="{ '!text-green-500': currentSong.id == song.id && data.playListInfo.id == currentPlaylist }">{{ index + 1 }}</td>
+          <tr v-for="(song, index) in data.listSong" :key="song?.id" class="hover:bg-neutral-800 cursor-pointer"
+           @mouseenter="() => showSaveBtn(song?.id)" @mouseleave="() => hiddenSaveBtn()" @click="playSong(index, data.listSong)">
+            <td class="font-semibold text-gray-500 text-2xl p-2 text-center pr-6" :class="{ '!text-green-500': currentSong?.id == song?.id && data?.playListInfo?.id == currentPlaylist }">{{ index + 1 }}</td>
             <td class="p-2">
               <div class="flex gap-2 items-center">
                 <div class="w-13 h-13 bg-cover">
                   <img :src="song.cover_url" class="rounded-lg" />
                 </div>
                 <div class="flex flex-col">
-                  <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong.id == song.id && data.playListInfo.id == currentPlaylist }">{{ song.song_name }}</p>
+                  <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong?.id == song?.id && data?.playListInfo?.id == currentPlaylist }">{{ song.song_name }}</p>
                   <p class="font-semibold text-gray-500 text-lg">{{ song.author }}</p>
                 </div>
               </div>
             </td>
             <td class="w-[40px]">
-              <button v-if="existFav(song.id)" class="flex items-center justify-center w-5 h-5 rounded-full border-none bg-green-500 cursor-pointer"><i class="fa-solid fa-check text-xs text-black"></i></button>
-              <button v-else v-show="visibleSave == song.id" @click.stop="addFavSong(song.id)" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
+              <button v-if="existFav(song?.id)" class="flex items-center justify-center w-5 h-5 rounded-full border-none bg-green-500 cursor-pointer"><i class="fa-solid fa-check text-xs text-black"></i></button>
+              <button v-else v-show="visibleSave == song?.id" @click.stop="addFavSong(song?.id)" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
             </td>
             <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ song.time }}</td>
           </tr>
