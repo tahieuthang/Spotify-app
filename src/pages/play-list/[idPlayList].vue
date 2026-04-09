@@ -1,16 +1,16 @@
 <template>
   <div v-loading="loadingState" class="flex flex-col gap-15 bg-[#111111] rounded-xl px-7 py-8">
     <div class="flex gap-8">
-      <div v-if="data.playListInfo.cover_url != ''" class="bg-cover">
-        <img :src="data.playListInfo.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
+      <div v-if="data.playListInfo?.cover_url" class="bg-cover">
+        <img :src="data.playListInfo?.cover_url" alt="ngot" class="rounded-sm w-[280px] h-[280px]" />
       </div>
       <div v-else class="flex items-center justify-center w-[280px] h-[280px] bg-neutral-700 rounded-sm">
         <i class="fa-solid fa-music text-7xl"></i>
       </div>
       <div class="flex flex-col justify-end items-start gap-3">
         <p class="font-bold text-lg">Danh sách phát công khai</p>
-        <p class="font-extrabold text-7xl leading-[1.5] whitespace-nowrap overflow-hidden overflow-ellipsis">{{ data.playListInfo.name }}</p>
-        <p class="font-bold text-gray-500">Của {{ data.ownerInfor.name }}</p>
+        <p class="font-extrabold text-7xl leading-[1.5] whitespace-nowrap overflow-hidden overflow-ellipsis">{{ data.playListInfo?.name || '' }}</p>
+        <p class="font-bold text-gray-500">Của {{ data.ownerInfor?.name || '' }}</p>
         <div class="flex gap-3 items-center">
           <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" class="w-6 h-6" />
           <p class="font-bold text-gray-500"><span class="font-bold text-lg text-white">Spotify</span> &bull; 2230 lượt lưu &bull; {{ data.playListInfo.song_id?.length || 0 }} bài hát</p>
@@ -26,7 +26,7 @@
     </div>
     <div class="flex gap-4 items-center mb-1">
       <button @click="playPlayList" class="flex justify-center items-center rounded-full w-15 h-15 bg-green-500 hover:scale-105 hover:bg-green-400 cursor-pointer">
-        <i v-if="isPlaying && currentPlaylist === data.playListInfo.id" class="fa-solid fa-pause text-2xl text-black"></i>
+        <i v-if="isPlaying && currentPlaylist === data.playListInfo?.id" class="fa-solid fa-pause text-2xl text-black"></i>
         <i v-else class="fa-solid fa-play text-2xl text-black"></i>
       </button>
       <!-- <button @click="savePlaylist" v-show="!isMyPlaylist" class="border-none cursor-pointer">
@@ -51,11 +51,11 @@
             <td class="p-2">
               <div class="flex gap-2 items-center">
                 <div class="w-13 h-13 bg-cover">
-                  <img :src="song.cover_url" class="rounded-lg" />
+                  <img :src="song?.cover_url" class="rounded-lg" />
                 </div>
                 <div class="flex flex-col">
-                  <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong?.id == song?.id && data?.playListInfo?.id == currentPlaylist }">{{ song.song_name }}</p>
-                  <p class="font-semibold text-gray-500 text-lg">{{ song.author }}</p>
+                  <p class="font-semibold text-white text-lg" :class="{ '!text-green-500': currentSong?.id == song?.id && data?.playListInfo?.id == currentPlaylist }">{{ song?.song_name }}</p>
+                  <p class="font-semibold text-gray-500 text-lg">{{ song?.author }}</p>
                 </div>
               </div>
             </td>
@@ -63,7 +63,7 @@
               <button v-if="existFav(song?.id)" class="flex items-center justify-center w-5 h-5 rounded-full border-none bg-green-500 cursor-pointer"><i class="fa-solid fa-check text-xs text-black"></i></button>
               <button v-else v-show="visibleSave == song?.id" @click.stop="addFavSong(song?.id)" class="flex items-center justify-center w-5 h-5 rounded-full border border-neutral-800 border-2 cursor-pointer"><i class="fa-solid fa-plus text-xs"></i></button>
             </td>
-            <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ song.time }}</td>
+            <td class="font-semibold text-gray-500 text-lg p-2 text-center">{{ song?.time }}</td>
           </tr>
       </tbody>
     </table>
@@ -87,8 +87,8 @@ const isAuthenticated = computed(() => stores.isLogged)
 const loadingState = ref(false)
 
 const data = ref({
-  playListInfo: {},
-  ownerInfor: {},
+  playListInfo: null,
+  ownerInfor: null,
   listSong: [],
   privatePlaylist: []
 })
@@ -96,9 +96,18 @@ const data = ref({
 const getPlayListData = async () => {
   const response = await axios.get('/play-list')
   if(response) {
-    data.value.playListInfo = response.data.find((res) => res.id == route.params.idPlayList)
-    getOwner(data.value.playListInfo.owner_id)
-    getSongs(data.value.playListInfo.song_id)
+    const playlist = response.data.find((res) => res.id == route.params.idPlayList) || null
+    data.value.playListInfo = playlist
+
+    // Tránh crash trên môi trường deploy khi id không khớp hoặc dữ liệu null.
+    if (!playlist) {
+      data.value.ownerInfor = null
+      data.value.listSong = []
+      return
+    }
+
+    getOwner(playlist.owner_id)
+    getSongs(playlist.song_id || [])
   }
 }
 
@@ -113,9 +122,16 @@ const getMyPlaylist = async () => {
   }
 }
 
-const isMyPlaylist = computed(() => data.value.privatePlaylist.includes(data.value.playListInfo.id))
+const isMyPlaylist = computed(() => {
+  if (!data.value.playListInfo) return false
+  return data.value.privatePlaylist.includes(data.value.playListInfo.id)
+})
 
 const getSongs = async (songsId) => {
+  if (!Array.isArray(songsId)) {
+    data.value.listSong = []
+    return
+  }
   const response = await axios.get('/songs')
   if(response) {
     let songArray = []
@@ -165,6 +181,8 @@ const currentPlaylist = computed(() => stores.currentPlaylist)
 
 // Phát cả playlist, dmm mãi mới xong cl này
 const playPlayList = () => {
+  if (!data.value.playListInfo?.id || !data.value.listSong.length) return
+
   const isSamePlaylist = currentPlaylist.value === data.value.playListInfo.id
   if (!isSamePlaylist) {
     // Phát playlist mới (auto chạy)
